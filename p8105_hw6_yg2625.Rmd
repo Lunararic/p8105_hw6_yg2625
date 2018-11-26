@@ -102,5 +102,11 @@ fit_log_all %>%
   theme(axis.text.x = element_text(angle = 80, hjust = 1))
 ```
 
+**Comments:**   
+From the plot, we could observe that Boston has the lowest adjusted OR and Tampa has the highest one. Most of the cities has adjusted OR lower than 1 except for Durham, Birmingham and Tampa. For those cities with adjusted OR lower than 1, it indicates that the resolved cases among non-whites have lower odds compared to the resolved cases among the whites. In Durham, Birmingham and Tampa, since their adjusted OR are greater or equal to 1, it indicates the resolved cases among non-whites have higher or equal odds compared to the resolved cases among the whites.  
+
+By observing the CIs, we could find that Houston, Durham and Tampa have relatively high-range intervals, meaning the true adjusted OR may fall in the wider range compared to other cities and we need further analysis combined with the observations to p-value to make reasonable conclusions.
+
+
 
 
