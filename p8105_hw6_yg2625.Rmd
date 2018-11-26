@@ -84,8 +84,22 @@ fit_log_all =
          OR_high = exp(estimate + qnorm(1-0.05/2)*std.error)) %>% 
   select(-term, -std.error, -p.value, - statistic)
 
-# show the first 10 outputs of the tidies model dataset
-head(fit_log_all, 10)
+# show the first 10 outputs of the tidies model dataset as dataframe
+head(fit_log_all, 10) %>% 
+  knitr::kable(digits = 3)
+```
+
+* Create a plot that shows the estimated ORs and CIs for each city. Organize cities according to estimated OR, and comment on the plot
+```{r}
+fit_log_all %>% 
+  mutate(city_state = forcats::fct_reorder(city_state, estimate)) %>% 
+  ggplot(aes(x = city_state, y = OR)) +
+  geom_point() +
+  geom_errorbar(aes(ymin = OR_low, ymax = OR_high)) +
+  labs(title = "Estimated ORs and CIs for each city",
+       x = "City, State",
+       y = "Estimated Adjusted OR") +
+  theme(axis.text.x = element_text(angle = 80, hjust = 1))
 ```
 
 
