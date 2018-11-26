@@ -46,7 +46,7 @@ As required, binary variable *solved* have value 0 if the case is unsolved, have
 * For the city of Baltimore, MD, use the glm function to fit a logistic regression with resolved vs unresolved as the outcome and victim age, sex and race as predictors
 * Save the output of glm as an R object
 ```{r}
-balt_fit_log = 
+fit_log_balt = 
   homi_create %>% 
   filter(city_state == "Baltimore, MD") %>% 
   glm(solved ~ victim_age + victim_sex + victim_race, data = ., family = binomial())
@@ -56,7 +56,7 @@ balt_fit_log =
 * Apply the broom::tidy to this object
 * Obtain the estimate and confidence interval of the adjusted odds ratio for solving homicides comparing non-white victims to white victims keeping all other variables fixed
 ```{r}
-balt_fit_log %>% 
+fit_log_balt %>% 
   broom::tidy() %>%
   mutate(OR = exp(estimate),
          OR_low = exp(estimate - qnorm(1-0.05/2)*std.error),
@@ -69,3 +69,7 @@ With the output, we could know the adjusted odds ratio for solving homicides com
 
 
 * Run glm for each of the cities in your dataset, and extract the adjusted odds ratio (and CI) for solving homicides comparing non-white victims to white victims
+```{r}
+
+```
+
