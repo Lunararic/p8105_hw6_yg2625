@@ -218,5 +218,16 @@ cv_df =
          rmse_fit2 = map2_dbl(fit2, test, ~rmse(model = .x, data = .y)))
 ```
 
-Based on the CV output, make further comparison using violin plot
+Based on the CV output, make further comparison using violin plot by ploting the prediction error
 
+```{r}
+cv_df %>% 
+  select(starts_with("rmse")) %>% 
+  gather(key = model, value = rmse) %>% 
+  mutate(model = str_replace(model, "rmse_", ""),
+         model = fct_inorder(model)) %>% 
+  ggplot(aes(x = model, y = rmse)) +
+  geom_violin()
+```
+
+**Conclusion:** Based on the violin plot, final_fit model has the lowest rmse and it's the most appropriate model for baby's birth weight in grams.
