@@ -12,6 +12,8 @@ knitr::opts_chunk$set(echo = TRUE)
 # Library
 ```{r, message = F}
 library(tidyverse)
+library(modelr)
+library(mgcv)
 ```
 
 # Problem 1
@@ -160,16 +162,16 @@ summary(step8)
 
 The backward elimination process is shown above in comments, the main process is eliminating predictors with the highest p-value > 0.05 until no predictors is non-significant. and the final chosen model including predictors shown below:
 ```{r}
-final.fit = lm(bwt ~ babysex + bhead + blength + delwt + gaweeks + mheight + parity + ppwt + smoken + mrace, data = birth_tidy)
-summary(final.fit)
+final_fit = lm(bwt ~ babysex + bhead + blength + delwt + gaweeks + mheight + parity + ppwt + smoken + mrace, data = birth_tidy)
+summary(final_fit)
 ```
 
 ## Show a plot of model residuals against fitted values
 
 ```{r}
 birth_tidy %>% 
-  modelr::add_residuals(final.fit) %>% 
-  modelr::add_predictions(final.fit) %>% 
+  modelr::add_residuals(final_fit) %>% 
+  modelr::add_predictions(final_fit) %>% 
   ggplot(aes(x = pred, y = resid)) +
   geom_point() +
   geom_hline(yintercept = 0, color = "red") +
@@ -178,11 +180,42 @@ birth_tidy %>%
        y = "Residuals")
   
 ```
-By the plot, we could see that although there are several extremely high residual points, most of the datapoints generally spread out around the 0 line and the linear is reasonable.
+By the plot, we could see that although there are several extremely high residual points, most of the datapoints generally spread out and bounce around the 0 line and the relationship is reasonable.
 
 
 ## Compare your model to two others
 * One using length at birth and gestational age as predictors
+
+```{r}
+fit1 = lm(bwt ~ blength + gaweeks, data = birth_tidy)
+
+summary(fit1)
+```
+
 * One using head circumference, length, sex, and all interactions between these
+
+```{r}
+fit2 = lm(bwt ~ bhead + blength + babysex + bhead * blength + blength * babysex + bhead * babysex + bhead * blength * babysex, data = birth_tidy)
+
+summary(fit2)
+```
+
+* Make this comparison in terms of the cross-validated prediction error
+
+```{r}
+cv_df = 
+  crossv_mc(birth_tidy, 100)
+
+cv_df =
+  cv_df %>% 
+  mutate(train = map(train, as_tibble),
+         test = map(test, as_tibble)) %>% 
+  mutate(final_fit = map(train, ~lm(bwt ~ babysex + bhead + blength + delwt + gaweeks + mheight + parity + ppwt + smoken + mrace, data = .x)),
+         fit1 = map(train, ~lm(bwt ~ blength + gaweeks, data = .x)),
+         fit2 = map(train, ~lm(bwt ~ bhead + blength + babysex + bhead * blength + blength * babysex + bhead * babysex + bhead * blength * babysex, data = .x))) %>% 
+  mutate(rmse_final_fit = map2_dbl(final_fit, test, ~rmse(model = .x, data = .y)),
+         rmse_fit1 = map2_dbl(fit1, test, ~rmse(model = .x, data = .y)),
+         rmse_fit2 = map2_dbl(fit2, test, ~rmse(model = .x, data = .y)))
+```
 
 
