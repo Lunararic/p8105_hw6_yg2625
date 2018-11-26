@@ -108,5 +108,21 @@ From the plot, we could observe that Boston has the lowest adjusted OR and Tampa
 By observing the CIs, we could find that Houston, Durham and Tampa have relatively high-range intervals, meaning the true adjusted OR may fall in the wider range compared to other cities and we need further analysis combined with the observations to p-value to make reasonable conclusions.
 
 
+# Problem 2
+## Load and clean the data
+```{r, message = FALSE}
+birth_tidy = read_csv("./data/birthweight.csv") %>% 
+  janitor::clean_names() %>%
+  mutate(babysex = as.factor(babysex),
+         frace = as.factor(frace),
+         malform = as.factor(malform),
+         mrace = as.factor(mrace))
+
+anyNA(birth_tidy)
+head(birth_tidy, 10)
+
+```
+
+With the output from anyNA, we know there is no missing values in the dataset, and we converted all numeric to factor where appropriate.
 
 
