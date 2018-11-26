@@ -180,6 +180,7 @@ birth_tidy %>%
        y = "Residuals")
   
 ```
+
 By the plot, we could see that although there are several extremely high residual points, most of the datapoints generally spread out and bounce around the 0 line and the relationship is reasonable.
 
 
