@@ -16,7 +16,7 @@ library(tidyverse)
 
 # Problem 1
 ## Import data
-```{r}
+```{r, message = FALSE}
 homi_raw = read_csv("https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv")
 head(homi_raw, 10)
 ```
@@ -57,10 +57,15 @@ balt_fit_log =
 * Obtain the estimate and confidence interval of the adjusted odds ratio for solving homicides comparing non-white victims to white victims keeping all other variables fixed
 ```{r}
 balt_fit_log %>% 
-  broom::tidy() %>% 
+  broom::tidy() %>%
   mutate(OR = exp(estimate),
-         OR_low = OR - qnorm(1-0.05/2)*std.error,
-         OR_high = OR + OR - qnorm(1-0.05/2)*std.error)
-  
+         OR_low = exp(estimate - qnorm(1-0.05/2)*std.error),
+         OR_high = exp(estimate + qnorm(1-0.05/2)*std.error)) %>%
+  select(term, estimate, OR, OR_low, OR_high) %>% 
+  knitr::kable(digits = 3)
 ```
 
+With the output, we could know the adjusted odds ratio for solving homicides comparing non-white victims to white victims is 0.441 keep all else fixed. And we are 95% confident that the adjusted odds ratio will fall in the range from 0.313 to 0.620.
+
+
+* Run glm for each of the cities in your dataset, and extract the adjusted odds ratio (and CI) for solving homicides comparing non-white victims to white victims
