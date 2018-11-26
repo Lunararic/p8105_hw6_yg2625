@@ -155,13 +155,34 @@ summary(step7)
 # take out mrace
 step8 = update(step7, . ~ . -mrace)
 summary(step8)
+## Since adjusted R-square got lower, we need to include mrace
 ```
 
 The backward elimination process is shown above in comments, the main process is eliminating predictors with the highest p-value > 0.05 until no predictors is non-significant. and the final chosen model including predictors shown below:
 ```{r}
-final.fit = lm(bwt ~ babysex + bhead + blength + delwt + gaweeks + mheight + parity + ppwt + smoken, data = birth_tidy)
+final.fit = lm(bwt ~ babysex + bhead + blength + delwt + gaweeks + mheight + parity + ppwt + smoken + mrace, data = birth_tidy)
 summary(final.fit)
 ```
 
+## Show a plot of model residuals against fitted values
+
+```{r}
+birth_tidy %>% 
+  modelr::add_residuals(final.fit) %>% 
+  modelr::add_predictions(final.fit) %>% 
+  ggplot(aes(x = pred, y = resid)) +
+  geom_point() +
+  geom_hline(yintercept = 0, color = "red") +
+  labs(title = "Model Residuals vs. Fitted Values",
+       x = "Fitted Values",
+       y = "Residuals")
+  
+```
+By the plot, we could see that although there are several extremely high residual points, most of the datapoints generally spread out around the 0 line and the linear is reasonable.
+
+
+## Compare your model to two others
+* One using length at birth and gestational age as predictors
+* One using head circumference, length, sex, and all interactions between these
 
 
