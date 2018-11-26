@@ -70,6 +70,23 @@ With the output, we could know the adjusted odds ratio for solving homicides com
 
 * Run glm for each of the cities in your dataset, and extract the adjusted odds ratio (and CI) for solving homicides comparing non-white victims to white victims
 ```{r}
+fit_log_all =
+  homi_create %>% 
+  group_by(city_state) %>% 
+  nest() %>% 
+  mutate(models = map(data, ~glm(solved ~ victim_age + victim_sex + victim_race, data = ., family = binomial())),
+         models = map(models, broom::tidy)) %>% 
+  select(-data) %>% 
+  unnest() %>% 
+  filter(term == "victim_racenonwhite") %>%
+  mutate(OR = exp(estimate),
+         OR_low = exp(estimate - qnorm(1-0.05/2)*std.error),
+         OR_high = exp(estimate + qnorm(1-0.05/2)*std.error)) %>% 
+  select(-term, -std.error, -p.value, - statistic)
 
+# show the first 10 outputs of the tidies model dataset
+head(fit_log_all, 10)
 ```
+
+
 
