@@ -33,10 +33,34 @@ homi_create =
          solved = ifelse(disposition == "Closed without arrest" | disposition == "Open/No arrest", 0, 1)) %>% 
   filter(city_state != "Dallas, TX" , city_state != "Phoenix, AZ", city_state != "Kansas City, MO", city_state != "Tulsa, AL") %>% 
   mutate(victim_race = ifelse(victim_race == "White", "white", "nonwhite"),
+         victim_race = fct_relevel(victim_race, "white"),
          victim_age = as.numeric(victim_age))
 
-class(homi_raw$victim_age)
+class(homi_create$victim_age)
+class(homi_create$victim_race)
 
 ```
-As required, binary variable *solved* has value 0 if the case is unsolved, has value 1 if the case is solved and *victim_age* is numeric.
+As required, binary variable *solved* have value 0 if the case is unsolved, have value 1 if the case is solved, *victim_race* have categories white and non-white as factors and *victim_age* are numeric.
+
+## Fit regression
+* For the city of Baltimore, MD, use the glm function to fit a logistic regression with resolved vs unresolved as the outcome and victim age, sex and race as predictors
+* Save the output of glm as an R object
+```{r}
+balt_fit_log = 
+  homi_create %>% 
+  filter(city_state == "Baltimore, MD") %>% 
+  glm(solved ~ victim_age + victim_sex + victim_race, data = ., family = binomial())
+  
+```
+
+* Apply the broom::tidy to this object
+* Obtain the estimate and confidence interval of the adjusted odds ratio for solving homicides comparing non-white victims to white victims keeping all other variables fixed
+```{r}
+balt_fit_log %>% 
+  broom::tidy() %>% 
+  mutate(OR = exp(estimate),
+         OR_low = OR - qnorm(1-0.05/2)*std.error,
+         OR_high = OR + OR - qnorm(1-0.05/2)*std.error)
+  
+```
 
