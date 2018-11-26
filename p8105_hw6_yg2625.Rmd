@@ -125,4 +125,43 @@ head(birth_tidy, 10)
 
 With the output from anyNA, we know there is no missing values in the dataset, and we converted all numeric to factor where appropriate.
 
+## Propose a regression model for birthweight
+Using **Backward Elimination** by starting with all predictors in the model and remove the predictor with the highest p-value > alpha
+```{r}
+# fit a regression using all predictors and do elimataion with alpha = 0.05
+mult.fit = lm(bwt ~ ., data = birth_tidy)
+summary(mult.fit)
+# take out 3 predictors because of singularities
+step1 = update(mult.fit, . ~ . -pnumlbw -pnumsga -wtgain)
+summary(step1)
+# take out frace since frace factor 8 has the highest p-value
+step2 = update(step1, . ~ . -frace)
+summary(step2)
+# take out malform
+step3 = update(step2, . ~ . -malform)
+summary(step3)
+# take out ppbmi
+step4 = update(step3, . ~ . -ppbmi)
+summary(step4)
+# take out momage
+step5 = update(step4, . ~ . -momage)
+summary(step5)
+# take out menarche
+step6 = update(step5, . ~ . -menarche)
+summary(step6)
+# take out fincome
+step7 = update(step6, . ~ . -fincome)
+summary(step7)
+# take out mrace
+step8 = update(step7, . ~ . -mrace)
+summary(step8)
+```
+
+The backward elimination process is shown above in comments, the main process is eliminating predictors with the highest p-value > 0.05 until no predictors is non-significant. and the final chosen model including predictors shown below:
+```{r}
+final.fit = lm(bwt ~ babysex + bhead + blength + delwt + gaweeks + mheight + parity + ppwt + smoken, data = birth_tidy)
+summary(final.fit)
+```
+
+
 
